@@ -1,0 +1,143 @@
+{
+    "type": "Diagram",
+    "elements": [{
+            "type": "Node",
+            "kind": "ellipse",
+            "label": 8,
+            "children": [
+                8
+            ],
+            "id": 29,
+            "items": [{
+                "type": "arc",
+                "timestamp": "2019-10-05 20:53:54.047000",
+                "cx": 65.331573,
+                "cy": 62.608162,
+                "rx": 22.828157,
+                "ry": 22.828161,
+                "phi": 0,
+                "startAngle": 0,
+                "sweepAngle": 6.2831855,
+                "id": "0000080001008100ff00"
+            }],
+            "cx": 65.331573,
+            "cy": 62.608162,
+            "rx": 22.828157,
+            "ry": 22.828161
+        },
+        {
+            "type": "Node",
+            "kind": "circle",
+            "label": 56,
+            "children": [
+                56
+            ],
+            "id": 45,
+            "items": [{
+                "type": "arc",
+                "timestamp": "2019-10-05 20:53:59.373000",
+                "cx": 171.59734,
+                "cy": 62.608162,
+                "rx": 22.828159,
+                "ry": 22.828159,
+                "phi": 0,
+                "startAngle": 0,
+                "sweepAngle": 6.2831855,
+                "id": "0000090001008100ff00"
+            }],
+            "cx": 171.59734,
+            "cy": 62.608162,
+            "r": 22.828159
+        },
+        {
+            "type": "Edge",
+            "kind": "line",
+            "connected": [
+                29,
+                45
+            ],
+            "ports": [
+                0,
+                1
+            ],
+            "id": 37,
+            "items": [{
+                "type": "line",
+                "timestamp": "2019-10-05 20:53:56.550000",
+                "x1": 88.159721,
+                "y1": 62.608166,
+                "x2": 148.76945,
+                "y2": 62.608173,
+                "id": "00000a0001000300ff00"
+            }],
+            "x1": 88.159721,
+            "y1": 62.60817,
+            "x2": 148.76945,
+            "y2": 62.60817,
+            "p2Decoration": "arrow-head"
+        },
+        {
+            "type": "Text",
+            "parent": 29,
+            "id": 8,
+            "label": "A",
+            "words": [{
+                "label": "A",
+                "candidates": [
+                    "A",
+                    "1-",
+                    "a",
+                    "A-",
+                    "it"
+                ],
+                "items": [{
+                    "type": "glyph",
+                    "timestamp": "2019-10-05 20:53:50.223000",
+                    "label": "A",
+                    "bounding-box": {
+                        "x": 63.739944,
+                        "y": 60.805687,
+                        "width": 3.1832581,
+                        "height": 3.60495
+                    },
+                    "baseline": 1.0000006,
+                    "x-height": 0.74655962,
+                    "id": "00000b0001000700ff00"
+                }]
+            }]
+        },
+        {
+            "type": "Text",
+            "parent": 45,
+            "id": 56,
+            "label": "B",
+            "words": [{
+                "label": "B",
+                "candidates": [
+                    "B",
+                    "13",
+                    "Be",
+                    "D",
+                    "b"
+                ],
+                "items": [{
+                    "type": "glyph",
+                    "timestamp": "2019-10-05 20:54:01.566000",
+                    "label": "B",
+                    "bounding-box": {
+                        "x": 170.35297,
+                        "y": 60.813957,
+                        "width": 2.488739,
+                        "height": 3.5884171
+                    },
+                    "baseline": 1.0000005,
+                    "x-height": 0.74999994,
+                    "left-side-bearing": -0.19767441,
+                    "id": "00000c0001000700ff00"
+                }]
+            }]
+        }
+    ],
+    "version": "2",
+    "id": "MainBlock"
+}

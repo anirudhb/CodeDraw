@@ -1,9 +1,13 @@
 {
-  "name": "codedraw-web",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
-    "myscript": "^4.3.0"
-  }
+    "name": "codedraw-web",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "serve": "node index.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "myscript": "^4.3.0"
+    }
 }
