@@ -47,10 +47,6 @@ MyScript.register(editorElement, {
         protocol: 'WEBSOCKET',
         apiVersion: 'V4',
         server: {
-            //applicationKey: '006df10c-c66b-4c53-8596-03636a5530d1',
-            //hmacKey: '40645187-9dcc-4997-a55b-13bdeb302158'
-            scheme: 'https',
-            host: 'webdemoapi.myscript.com',
             applicationKey: secrets.applicationKey,
             hmacKey: secrets.hmacKey
         },
