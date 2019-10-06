@@ -29,7 +29,9 @@ convertElement.addEventListener('click', function() {
         method: "POST",
         body: jiix
     }).then(r => r.json()).then(j => {
-        console.log(r);
+        console.log(j);
+        // Run the code!!!
+        eval(j.code);
     });
 });
 /**

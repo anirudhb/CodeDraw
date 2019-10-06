@@ -55,8 +55,8 @@ app.post("/jiix2code", (req, res) => {
     function findArgEdge(begin_node) {
         let beginId = begin_node.id;
         let a = jiix.elements.filter(x => {
-            if (x.type != "Edge" || x.connected[1] != beginId) return false;
-            let endpoint = findNode(x.connected[0]);
+            if (x.type != "Edge" || x.connected[0] != beginId) return false;
+            let endpoint = findNode(x.connected[1]);
             if (endpoint.type == "Node" && endpoint.kind == "rectangle") return true;
             return false;
         });
@@ -83,9 +83,10 @@ app.post("/jiix2code", (req, res) => {
             continue;
         }
         found_edges.push(node2rect_edge);
-        let arg = findNode(node2rect_edge.connected[0]);
+        let arg = findNode(node2rect_edge.connected[1]);
+        console.log(arg);
         let parent = findArgParent(arg);
-        console.log(findNode(parent.label).label);
+        console.log(nodeToText(parent));
         if (!arg_count.hasOwnProperty(parent)) {
             arg_count[parent] = 0;
         }
@@ -97,7 +98,49 @@ app.post("/jiix2code", (req, res) => {
     }
     let texts = nodes.map(nodeToText);
     console.log(texts);
-    res.send("{}");
+
+    console.log("=====================================================================");
+
+    /* Convert it into code!! */
+    function addslashes(str) {
+        return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+    }
+    let code = "";
+    for (let node of nodes) {
+        let text = nodeToText(node);
+        if (text.toLowerCase().startsWith("ask")) {
+            let prompt = text.split("\n")[1];
+            code += "let result_" + node.id + "=prompt(\"" + addslashes(prompt) + "\");";
+        }
+        if (text.toLowerCase().startsWith("add")) {
+            let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
+            let arg_vars = args.map(x => "result_" + x.id);
+            code += "result_" + node.id + "=";
+            for (const i in arg_vars) {
+                code += arg_vars[i];
+                if (i != arg_vars.length - 1) code += "+";
+            }
+            code += ";";
+        }
+        if (text.toLowerCase().startsWith("text")) {
+            let t = text.split("\n").slice(1).join("\n");
+            code += "let result_" + node.id + "=\"" + addslashes(t) + "\";";
+        }
+        if (text.toLowerCase().startsWith("number")) {
+            let text = text.split("\n").slice(1).join("\n");
+            code += "let result_" + node.id + "=Number(\"" + addslashes(text) + "\");";
+        }
+        if (text.toLowerCase().startsWith("say")) {
+            let arg = arg_providers.find(([a, b, c]) => b == node && c == 0);
+            let arg_var = "result_" + arg[0].id;
+            code += "result_" + node.id + "=alert(" + arg_var + ");";
+        }
+    }
+
+    console.log("Code:");
+    console.log(code);
+
+    res.send(JSON.stringify({ code }));
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}`));
