@@ -135,12 +135,12 @@ app.post("/jiix2code", (req, res) => {
             code += "let result_" + node.id + "=prompt(\"" + addslashes(prompt) + "\");";
         }
         if (text.toLowerCase().startsWith("add")) {
-            let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
+            let args = arg_providers.filter(([a, b, c]) => b == node);
             let arg_vars = args.map(x => "result_" + x[0].id);
             code += "result_" + node.id + "=";
-            for (const i in arg_vars) {
-                code += arg_vars[i];
-                if (i != arg_vars.length - 1) code += "+";
+            for (const x of arg_vars) {
+                code += x;
+                if (arg_vars.indexOf(x) < arg_vars.length - 1) code += "+";
             }
             code += ";";
         }
@@ -182,7 +182,7 @@ app.post("/jiix2code", (req, res) => {
             let t = text.split("\n").slice(1).join("");
             code += "let result_" + node.id + "=Number(";
             if (t == "") {
-                let arg = arg_providers.find(([a, b, c]) => b == node && c == 0);
+                let arg = arg_providers.find(([a, b, c]) => b == node);
                 let arg_var = "result_" + arg[0].id;
                 code += arg_var + ");";
             } else {
@@ -190,7 +190,7 @@ app.post("/jiix2code", (req, res) => {
             }
         }
         if (text.toLowerCase().startsWith("say")) {
-            let arg = arg_providers.find(([a, b, c]) => b == node && c == 0);
+            let arg = arg_providers.find(([a, b, c]) => b == node);
             let arg_var = "result_" + arg[0].id;
             code += "result_" + node.id + "=alert(" + arg_var + ");";
         }
