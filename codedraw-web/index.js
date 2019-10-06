@@ -10,7 +10,6 @@ app.use(bodyParser.text());
 
 app.post("/jiix2code", (req, res) => {
     let jiix = JSON.parse(req.body);
-    require("fs").writeFileSync("jiix.json", req.body);
 
     function findNode(id) {
         return jiix.elements.filter(x => x.id == id)[0];
