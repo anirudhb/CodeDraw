@@ -23,6 +23,7 @@ app.post("/jiix2code", (req, res) => {
     }
 
     function nodeToText(node) {
+        if (!node) return "";
         if (node.label) return findNode(node.label).label;
         for (let childId of node.children) {
             let chn = findNode(childId);
@@ -63,7 +64,29 @@ app.post("/jiix2code", (req, res) => {
     }
 
     function findArgParent(arg) {
-        return nodes.filter(x => x.children.includes(arg.id))[0];
+        let x = nodes.filter(x => x.children && x.children.includes(arg.id))[0];
+        if (x) return x;
+        for (let node of nodes) {
+            let isParent = false;
+            // dispatch based on type of node
+            switch (node.kind) {
+                case "circle":
+                    function pic(n, x, y) {
+                        return (x - n.cx) ** 2 + (y - n.cy) ** 2 <= n.r;
+                    }
+                case "ellipse":
+                    function pic(n, x, y) {
+                        return ((x - n.cx) ** 2 / n.rx) + ((y - n.cy) ** 2 / n.ry) <= 1;
+                    }
+            }
+            let p0c = pic(node, arg.x, arg.y),
+                p1c = pic(node, arg.x + arg.width, arg.y),
+                p2c = pic(node, arg.x, arg.y + arg.height),
+                p3c = pic(node, arg.x + arg.width, arg.y + arg.height);
+            let ip = !p0c && !p1c && !p2c && !p3c;
+            if (ip) return node;
+        }
+        return null;
     }
     while (node2rect_edge) {
         let found = false;
@@ -113,7 +136,7 @@ app.post("/jiix2code", (req, res) => {
         }
         if (text.toLowerCase().startsWith("add")) {
             let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
-            let arg_vars = args.map(x => "result_" + x.id);
+            let arg_vars = args.map(x => "result_" + x[0].id);
             code += "result_" + node.id + "=";
             for (const i in arg_vars) {
                 code += arg_vars[i];
@@ -121,13 +144,50 @@ app.post("/jiix2code", (req, res) => {
             }
             code += ";";
         }
+        if (text.toLowerCase().startsWith("mul")) {
+            let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
+            let arg_vars = args.map(x => "result_" + x[0].id);
+            code += "result_" + node.id + "=";
+            for (const i in arg_vars) {
+                code += arg_vars[i];
+                if (i != arg_vars.length - 1) code += "*";
+            }
+            code += ";";
+        }
+        if (text.toLowerCase().startsWith("div")) {
+            let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
+            let arg_vars = args.map(x => "result_" + x[0].id);
+            code += "result_" + node.id + "=";
+            for (const i in arg_vars) {
+                code += arg_vars[i];
+                if (i != arg_vars.length - 1) code += "/";
+            }
+            code += ";";
+        }
+        if (text.toLowerCase().startsWith("sub")) {
+            let args = arg_providers.filter(([a, b, c]) => b == node).sort((a, b) => a[2] - b[2]);
+            let arg_vars = args.map(x => "result_" + x[0].id);
+            code += "result_" + node.id + "=";
+            for (const i in arg_vars) {
+                code += arg_vars[i];
+                if (i != arg_vars.length - 1) code += "-";
+            }
+            code += ";";
+        }
         if (text.toLowerCase().startsWith("text")) {
             let t = text.split("\n").slice(1).join("\n");
             code += "let result_" + node.id + "=\"" + addslashes(t) + "\";";
         }
-        if (text.toLowerCase().startsWith("number")) {
-            let text = text.split("\n").slice(1).join("\n");
-            code += "let result_" + node.id + "=Number(\"" + addslashes(text) + "\");";
+        if (text.toLowerCase().startsWith("number") || text.toLowerCase().startsWith("num")) {
+            let t = text.split("\n").slice(1).join("");
+            code += "let result_" + node.id + "=Number(";
+            if (t == "") {
+                let arg = arg_providers.find(([a, b, c]) => b == node && c == 0);
+                let arg_var = "result_" + arg[0].id;
+                code += arg_var + ");";
+            } else {
+                code += "\"" + addslashes(t) + "\");";
+            }
         }
         if (text.toLowerCase().startsWith("say")) {
             let arg = arg_providers.find(([a, b, c]) => b == node && c == 0);
