@@ -22,9 +22,10 @@ redoElement.addEventListener('click', function() {
 });
 convertElement.addEventListener('click', function() {
     editorElement.editor.convert();
+    editorElement.editor.export_();
     let jiix = editorElement.editor.exports["application/vnd.myscript.jiix"];
     console.log(jiix);
-    fetch("/jiix2js", {
+    fetch("/jiix2code", {
         method: "POST",
         body: jiix
     }).then(r => r.json()).then(j => {
@@ -44,19 +45,13 @@ MyScript.register(editorElement, {
         server: {
             applicationKey: secrets.applicationKey,
             hmacKey: secrets.hmacKey
+        },
+        v4: {
+            diagram: {
+                mimeTypes: ["application/vnd.myscript.jiix"]
+            }
         }
     }
-    /*
-    export: {
-        jiix: {
-            strokes: false,
-            text: {
-                chars: false,
-                words: false,
-            },
-        },
-    },
-    */
 });
 window.addEventListener('resize', function() {
     editorElement.editor.resize();
