@@ -10,7 +10,7 @@ app.use(bodyParser.text());
 
 app.post("/jiix2code", (req, res) => {
     let jiix = JSON.parse(req.body);
-    console.log(jiix);
+    require("fs").writeFileSync("jiix.json", req.body);
 
     function findNode(id) {
         return jiix.elements.filter(x => x.id == id)[0];
@@ -21,6 +21,15 @@ app.post("/jiix2code", (req, res) => {
         let a = jiix.elements.filter(
             x => x.type == "Edge" && x.connected[0] == beginNode.id && findNode(x.connected[1]).kind != "rectangle");
         return a[0];
+    }
+
+    function nodeToText(node) {
+        if (node.label) return findNode(node.label).label;
+        for (let childId of node.children) {
+            let chn = findNode(childId);
+            if (chn.label && (typeof chn.label == "string")) return chn.label;
+        }
+        return "";
     }
     /**
      * Sort the nodes by id ascending so that they can be placed in an order
@@ -55,27 +64,7 @@ app.post("/jiix2code", (req, res) => {
     }
 
     function findArgParent(arg) {
-        for (let node of nodes) {
-            let isParent = false;
-            // dispatch based on type of node
-            switch (node.kind) {
-                case "circle":
-                    function pic(n, x, y) {
-                        return (x - n.cx) ** 2 + (y - n.cy) ** 2 <= n.r;
-                    }
-                case "ellipse":
-                    function pic(n, x, y) {
-                        return ((x - n.cx) ** 2 / n.rx) + ((y - n.cy) ** 2 / n.ry) <= 1;
-                    }
-            }
-            let p0c = pic(node, arg.x, arg.y),
-                p1c = pic(node, arg.x + arg.width, arg.y),
-                p2c = pic(node, arg.x, arg.y + arg.height),
-                p3c = pic(node, arg.x + arg.width, arg.y + arg.height);
-            let ip = !p0c && !p1c && !p2c && !p3c;
-            if (ip) return node;
-        }
-        return null;
+        return nodes.filter(x => x.children.includes(arg.id))[0];
     }
     while (node2rect_edge) {
         let found = false;
@@ -104,9 +93,9 @@ app.post("/jiix2code", (req, res) => {
     }
     console.log(arg_providers);
     for (const [provider, providee, argnum] of arg_providers) {
-        console.log(`${findNode(provider.label).label} => ${findNode(providee.label).label} (#${argnum})`);
+        console.log(`${nodeToText(provider)} => ${nodeToText(providee)} (#${argnum})`);
     }
-    let texts = nodes.map(x => findNode(x.label).label);
+    let texts = nodes.map(nodeToText);
     console.log(texts);
     res.send("{}");
 });
